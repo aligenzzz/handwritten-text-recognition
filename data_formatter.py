@@ -52,19 +52,26 @@ def vectorize_image(image_path):
 
     x_min, y_min, x_max, y_max = np.inf, np.inf, -np.inf, -np.inf
 
+    pixel_offset = 30
     for contour in contours:
         x, y, w, h = cv2.boundingRect(contour)
+
         x_min = min(x_min, x)
         y_min = min(y_min, y)
         x_max = max(x_max, x + w)
         y_max = max(y_max, y + h)
 
-    cropped_image = grayscale_image[y_min:y_max, x_min:x_max]
+    cropped_image = grayscale_image[y_min - pixel_offset:y_max + pixel_offset,
+                                    x_min - pixel_offset:x_max + pixel_offset]
     resized_image = cv2.resize(cropped_image, DESIRED_SIZE)
 
     vectorized_image = resized_image.flatten()
 
     # plot_image(vectorized_image)
+
+    vectorized_image = np.asarray(vectorized_image)
+    vectorized_image = vectorized_image.reshape(DESIRED_SIZE)
+    vectorized_image = vectorized_image.astype('float32') / 255
 
     return vectorized_image
 
@@ -77,3 +84,14 @@ def plot_image(vectorized_image):
     plt.show()
 
 
+# image_list must contain already vectorized images!!!
+def get_test_images(image_list):
+    images = []
+
+    for image in image_list:
+        images.append(image)
+
+    images = np.asarray(images)
+    images = images.reshape(-1, DESIRED_SIZE[0], DESIRED_SIZE[1], 1)
+
+    return images

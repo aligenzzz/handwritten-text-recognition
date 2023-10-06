@@ -4,3 +4,7 @@ ENGLISH_DATASET_TEST = 'D:/datasets/english/emnist-balanced-test.csv'
 ENGLISH_DATASET_MAPPING = 'D:/datasets/english/emnist-balanced-mapping.txt'
 
 DESIRED_SIZE = (28, 28)
+
+ENGLISH_MODEL = './models/english_model.h5'
+
+GRAPHICS = './graphics/'
