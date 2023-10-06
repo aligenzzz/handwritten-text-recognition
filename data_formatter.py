@@ -3,22 +3,44 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-from constants import ENGLISH_DATASET, ENGLISH_DATASET_IMAGES, DESIRED_SIZE
+from constants import ENGLISH_DATASET_TRAIN, ENGLISH_DATASET_TEST, \
+                      ENGLISH_DATASET_MAPPING, DESIRED_SIZE
 
 
-def dataset_to_training_sample():
-    # create panda dataframe from csv
-    df = pd.read_csv(ENGLISH_DATASET)
+def dataset_to_sample():
+    train_df = pd.read_csv(ENGLISH_DATASET_TRAIN, header=None)
+    test_df = pd.read_csv(ENGLISH_DATASET_TEST, header=None)
 
-    image_column = df['image'].astype(str)
-    label_column = df['label'].astype(str)
+    df = pd.concat([train_df, test_df], ignore_index=True)
 
-    x = []
-    for image in image_column:
-        x.append(vectorize_image(ENGLISH_DATASET_IMAGES + image))
-    y = label_column
-    print(x[0])
-    return x, y
+    def flip_and_rotate(element):
+        element = element.reshape(DESIRED_SIZE)
+        element = np.fliplr(element)
+        element = np.rot90(element)
+        return element
+
+    x = df.loc[:, 1:]
+    x = x.astype('float32') / 255
+    x = np.asarray(x)
+    x = np.apply_along_axis(flip_and_rotate, 1, x)
+
+    y = df.loc[:, 0]
+    y = y.astype(int)
+
+    encoded = get_encoded()
+
+    return x, y, encoded
+
+
+def get_encoded():
+    mapping = pd.read_csv(ENGLISH_DATASET_MAPPING, delimiter=' ', index_col=0, header=None)
+    mapping = mapping.iloc[:, 0]
+
+    encoded = dict()
+    for index, label in enumerate(mapping):
+        encoded[index] = chr(label)
+
+    return encoded
 
 
 def vectorize_image(image_path):
@@ -48,7 +70,7 @@ def vectorize_image(image_path):
 
 
 def plot_image(vectorized_image):
-    image_array = np.array(vectorized_image).reshape(28, 28)
+    image_array = np.array(vectorized_image).reshape(DESIRED_SIZE)
 
     plt.imshow(image_array, cmap='gray')
     plt.axis('off')
