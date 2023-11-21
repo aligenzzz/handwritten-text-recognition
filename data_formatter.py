@@ -43,55 +43,28 @@ def get_encoded():
     return encoded
 
 
-def vectorize_image(image_path):
-    image = cv2.imread(image_path)
+# for tests, locate them to another place later
+def vectorize_image(image):
     inverted_image = cv2.bitwise_not(image)
-    grayscale_image = cv2.cvtColor(inverted_image, cv2.COLOR_BGR2GRAY)
-
-    contours, _ = cv2.findContours(grayscale_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    x_min, y_min, x_max, y_max = np.inf, np.inf, -np.inf, -np.inf
-
-    pixel_offset = 30
-    for contour in contours:
-        x, y, w, h = cv2.boundingRect(contour)
-
-        x_min = min(x_min, x)
-        y_min = min(y_min, y)
-        x_max = max(x_max, x + w)
-        y_max = max(y_max, y + h)
-
-    cropped_image = grayscale_image[y_min - pixel_offset:y_max + pixel_offset,
-                                    x_min - pixel_offset:x_max + pixel_offset]
-    resized_image = cv2.resize(cropped_image, DESIRED_SIZE)
-
+    resized_image = cv2.resize(inverted_image, DESIRED_SIZE)
     vectorized_image = resized_image.flatten()
-
-    # plot_image(vectorized_image)
 
     vectorized_image = np.asarray(vectorized_image)
     vectorized_image = vectorized_image.reshape(DESIRED_SIZE)
+
+    # plt.imshow(vectorized_image, cmap='gray')
+    # plt.axis('off')
+    # plt.show()
+
     vectorized_image = vectorized_image.astype('float32') / 255
 
     return vectorized_image
 
 
-def plot_image(vectorized_image):
-    image_array = np.array(vectorized_image).reshape(DESIRED_SIZE)
-
-    plt.imshow(image_array, cmap='gray')
-    plt.axis('off')
-    plt.show()
-
-
 # image_list must contain already vectorized images!!!
 def get_test_images(image_list):
-    images = []
-
-    for image in image_list:
-        images.append(image)
-
+    images = [vectorize_image(image) for image in image_list]
     images = np.asarray(images)
-    images = images.reshape(-1, DESIRED_SIZE[0], DESIRED_SIZE[1], 1)
+    images = images.reshape((-1, *DESIRED_SIZE, 1))
 
     return images
