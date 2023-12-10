@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 from constants import ENGLISH_MODEL, DESIRED_SIZE
 from data_formatter import dataset_to_sample, get_encoded, get_test_images
 from segmentation import word_segmentation
+from spellchecker import SpellChecker
 
+english = SpellChecker()
 
 english_model = load_model(ENGLISH_MODEL)
 
@@ -36,6 +38,9 @@ def test_prediction():
 
 
 def word_prediction(characters):
+    if len(characters) == 0:
+        return ''
+
     encoded = get_encoded()
     characters = get_test_images(characters)
     predictions = english_model.predict(characters)
@@ -44,10 +49,25 @@ def word_prediction(characters):
     return predictions
 
 
+def predict(file_name):
+    words = word_segmentation(image_path=file_name)
+    text = ''
+    for word in words:
+        word = word_prediction(word)
+
+        word = ''.join(word)
+
+        result = english.correction(word)
+        if result is None:
+            text += word + ' '
+        else:
+            text += result + ' '
+
+    return text
+
+
 if __name__ == '__main__':
     # test_prediction()
 
-    word = word_segmentation(image_path='images/test.png')
-    result = word_prediction(word)
-
-    print(result)
+    result_text = predict('images/lines3.png')
+    print(result_text)

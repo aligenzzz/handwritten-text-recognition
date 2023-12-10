@@ -43,10 +43,29 @@ def get_encoded():
     return encoded
 
 
+def resize_with_padding(image, target_size):
+    h, w = image.shape[:2]
+    ratio = min(target_size[0] / w, target_size[1] / h)
+
+    new_w = int(w * ratio)
+    new_h = int(h * ratio)
+
+    resized = cv2.resize(image, (new_w, new_h))
+
+    result = np.zeros((target_size[1], target_size[0]), dtype=np.uint8)
+
+    x_offset = (target_size[0] - new_w) // 2
+    y_offset = (target_size[1] - new_h) // 2
+
+    result[y_offset:y_offset + new_h, x_offset:x_offset + new_w] = resized
+
+    return result
+
+
 # for tests, locate them to another place later
 def vectorize_image(image):
     inverted_image = cv2.bitwise_not(image)
-    resized_image = cv2.resize(inverted_image, DESIRED_SIZE)
+    resized_image = resize_with_padding(inverted_image, (28, 28))
     vectorized_image = resized_image.flatten()
 
     vectorized_image = np.asarray(vectorized_image)

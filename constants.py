@@ -8,3 +8,8 @@ DESIRED_SIZE = (28, 28)
 ENGLISH_MODEL = './models/english_model.h5'
 
 GRAPHICS = './graphics/'
+
+# for yolo model
+LABELS_PATH = './models/obj.names'
+WEIGHTS_PATH = './models/yolov4-obj_best.weights'
+CONFIG_PATH = './models/yolov4-obj.cfg'

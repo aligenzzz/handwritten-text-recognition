@@ -44,7 +44,7 @@ RLP = ReduceLROnPlateau(monitor='val_loss', patience=3, factor=0.2, min_lr=0.000
 
 english_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-history = english_model.fit(x_train, y_train, epochs=50, batch_size=32, verbose=1,
+history = english_model.fit(x_train, y_train, epochs=30, batch_size=32, verbose=1,
                             validation_data=(x_val, y_val),
                             callbacks=[early_stopping, checkpoint, RLP])
 
