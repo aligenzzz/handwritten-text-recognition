@@ -65,12 +65,13 @@ def get_words(line):
                 was = False
                 break
 
+    space = width / height * 8
     copy_words = words.copy()
     n = len(copy_words)
     for i in range(0, n, 2):
         if i == n - 1:
             continue
-        if abs(copy_words[i] - copy_words[i + 1]) < 40:
+        if abs(copy_words[i] - copy_words[i + 1]) < space:
             words.remove(copy_words[i])
             words.remove(copy_words[i + 1])
             pass
@@ -174,7 +175,7 @@ def word_segmentation(image_path):
             for box in boxes:
                 cropped = new_image[round(box[2]):round(box[3]), round(box[0]):round(box[1])]
                 cropped = find_bounding_box(cropped)
-                character = get_square_white_image(cropped, 10)
+                character = get_square_white_image(cropped, 20)
 
                 # plt.imshow(character, cmap='gray')
                 # plt.show()

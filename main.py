@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-from PIL import Image
 from predictions import predict
 import threading
 from ttkthemes import ThemedTk
@@ -30,6 +29,7 @@ class App:
     def choose_image(self):
         file_path = filedialog.askopenfilename(filetypes=[('Image files', '*.png;*.jpg;*.jpeg')])
         if file_path:
+            self.choose_button.configure(state='disabled')
             self.progress_bar.start()
             threading.Thread(target=self.run_predict, args=(file_path,)).start()
         else:
@@ -38,14 +38,14 @@ class App:
             self.result_text.insert(tk.END, result_message)
 
     def run_predict(self, file_path):
-        # try:
-        #
-        # except Exception as e:
-        #     result_message = 'Something went wrong'
-        #     print(e)
-        result_message = predict(file_name=file_path)
+        try:
+            result_message = predict(file_name=file_path)
+        except Exception as e:
+            result_message = 'Something went wrong'
+            print(e)
 
         self.progress_bar.stop()
+        self.choose_button.configure(state='normal')
 
         self.result_text.delete(1.0, tk.END)
         self.result_text.insert(tk.END, result_message)
